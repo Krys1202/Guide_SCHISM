@@ -5,3 +5,6 @@ It aims to try to gather as much information and links as possible on how to pro
 Of course this will evolve with the development of SCHISM and the tools that surround it, but it can be a good start to dive into the SCHISM world.
 In this document the term "the manual" refers to the SCHISM Manual v5.8. 
 This guide is primarily aimed at implementing SCHISM on a Linux platform, although, as you will see, our chosen grid generator is Windows-based.
+
+This project is synced with Overleaf:  https://www.overleaf.com/4263985246xmrwvdzmjtvs
+(Creation of the account is free.)
