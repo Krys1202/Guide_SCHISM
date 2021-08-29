@@ -137,7 +137,7 @@ Interesting links for the inputs files required by SCHISM:\\
     \item Boundary conditions input : bctides.in
     \item Bottom drag input : drag.gr3/manning.gr3/rough.gr3
 \end{enumerate}
-For the bottom drag input, drag.gr3 uses drag coefficient (\hl{=bottom roughness in meters? @Joseph}) and manning.gr3 uses the Manning's number $n$. Rough.gr3 uses $C_D$ bottom roughness in meters with specific equations. \\
+For the bottom drag input, drag.gr3 uses drag coefficient (dimensionless) and manning.gr3 uses the Manning's number $n$. Rough.gr3 uses $C_D$ bottom roughness in meters with specific equations from the logarithmic boundary layer profile. \\
 Example of directory for your SCHISM run is shown in Figure \ref{fig:run}.
 \begin{figure}[htbp]
     \centering
@@ -315,7 +315,7 @@ This will put into "bctides.in" for each constituent requested:
 You can also use BlueKenue to create a spatially varying Manning.gr3. See the steps in the pdf under /src/Utility/Pre-Processing/step\_by\_step\_bottom\_friction\_BK.pdf.
 \subsubsection{Rough.gr3}
 \hl{not clear, @Joseph could you check and explain more please?} \\
-Bottom roughness in meters are read from rough.gr3. In this case, negative or 0 depths in rough.gr3 indicate time-independent $C_D$, not roughness. With this option, two additional parameters are needed in param.nml: $dzb_{min}$ in meters and $dzb_{decay}$ nondimensional. Information can be found in the section 4.2.4.2 of the manual and in param.nml for the calculation of $C_D$ for rough.gr3:
+Bottom roughness in meters are read from rough.gr3. [from Joseph: we've removed negative roughnes in newer versions like v5.9] In this case, negative or 0 depths in rough.gr3 indicate time-independent $C_D$, not roughness. With this option, two additional parameters are needed in param.nml: $dzb_{min}$ in meters and $dzb_{decay}$ nondimensional. Information can be found in the section 4.2.4.2 of the manual and in param.nml for the calculation of $C_D$ for rough.gr3:
 \begin{lstlisting}
 Cd is calculated using :
 the log law, when dzb>=dzb_min; 
@@ -359,7 +359,7 @@ cdo -settunits,day sflux_new.nc sflux_air_1.0001.nc
 OR in one command
 cdo -setreftime,'2018-03-16','00:00:00',day sflux.nc sflux_air_1.0001.nc 
 \end{lstlisting}
-Put the file created in a folder "sflux" with a file "sflux\_inputs.txt" \hl{@Joseph: why we need this file}, and this folder in the folder of your run (Figure \ref{fig:sflux}).\begin{figure}[hbtp]
+Put the file created in a folder "sflux" with a file "sflux\_inputs.txt" (In this file advanced users can specify parameters like renaming variable names, resetting max time window etc. Most users won't bother about these), and this folder in the folder of your ru(n (Figure \ref{fig:sflux}).\begin{figure}[hbtp]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/sflux.png}
     \caption{Example of contents for sflux folder, also showing the contents the file sflux\_inputs.txt}
@@ -631,7 +631,7 @@ Global output is done every "nspool" steps, and a new output stack is opened eve
 
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\acknowledgments{\hl{Thanks to Xavier Bertin, Joseph Zhang, Vanessa Hernaman, Jerome Lefevre, Ivica Janekovic, Jaime Calzada and Roger Proctor.} }
+\acknowledgments{Thanks to Xavier Bertin, Joseph Zhang, Vanessa Hernaman, Jerome Lefevre, Ivica Janekovic, Jaime Calzada, Huy Quang Tran and Roger Proctor. }
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
