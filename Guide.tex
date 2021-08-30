@@ -638,7 +638,7 @@ Global output is done every "nspool" steps, and a new output stack is opened eve
 \appendixtitles{no} %Leave argument "no" if all appendix headings stay EMPTY (then no dot is printed after "Appendix A"). If the appendix sections contain a heading then change the argument to "yes".
 \appendix
 \section{}
-\hl{These scripts will be put in Github "in progress"}
+These scripts are in Github: \url{https://github.com/Krys1202/Guide_SCHISM/tree/main/Python_scripts}
 \unskip
 \subsection{Python script to create elev2D.th.nc}
 \begin{minted}{python}
@@ -926,6 +926,8 @@ with open('wwmbnd.gr3','w') as w:
     for i in range(ne):
         ww.writerow([i+1,3,nm[i,0],nm[i,1],nm[i,2]])
 
+# check duplicated nodes, and check for the first node of open 
+# bnd
 
 \end{minted}
 \clearpage
