@@ -312,10 +312,9 @@ This will put into "bctides.in" for each constituent requested:
     \caption{Steps for the creation of manning.gr3}
     \label{fig:hgridman}
 \end{figure}
-You can also use BlueKenue to create a spatially varying Manning.gr3. See the steps in the pdf under /src/Utility/Pre-Processing/step\_by\_step\_bottom\_friction\_BK.pdf.
+You can also use BlueKenue to create a spatially varying Manning.gr3 (Credit to Huy Quang Tran). See the steps in the pdf under /src/Utility/Pre-Processing/step\_by\_step\_bottom\_friction\_BK.pdf.
 \subsubsection{Rough.gr3}
-\hl{not clear, @Joseph could you check and explain more please?} \\
-Bottom roughness in meters are read from rough.gr3. [from Joseph: we've removed negative roughnes in newer versions like v5.9] In this case, negative or 0 depths in rough.gr3 indicate time-independent $C_D$, not roughness. With this option, two additional parameters are needed in param.nml: $dzb_{min}$ in meters and $dzb_{decay}$ nondimensional. Information can be found in the section 4.2.4.2 of the manual and in param.nml for the calculation of $C_D$ for rough.gr3:
+Bottom roughness in meters are read from rough.gr3. [\textcolor{green}{from Joseph}: we've removed negative roughnes in newer versions like v5.9] In this case, negative or 0 depths in rough.gr3 indicate time-independent $C_D$, not roughness. With this option, two additional parameters are needed in param.nml: $dzb_{min}$ in meters and $dzb_{decay}$ nondimensional. Information can be found in the section 4.2.4.2 of the manual and in param.nml for the calculation of $C_D$ for rough.gr3:
 \begin{lstlisting}
 Cd is calculated using :
 the log law, when dzb>=dzb_min; 
@@ -359,7 +358,7 @@ cdo -settunits,day sflux_new.nc sflux_air_1.0001.nc
 OR in one command
 cdo -setreftime,'2018-03-16','00:00:00',day sflux.nc sflux_air_1.0001.nc 
 \end{lstlisting}
-Put the file created in a folder "sflux" with a file "sflux\_inputs.txt" (In this file advanced users can specify parameters like renaming variable names, resetting max time window etc. Most users won't bother about these), and this folder in the folder of your ru(n (Figure \ref{fig:sflux}).\begin{figure}[hbtp]
+Put the file created in a folder "sflux" with a file "sflux\_inputs.txt" (In this file advanced users can specify parameters like renaming variable names, resetting max time window etc. Most users won't bother about these), and this folder in the folder of your run (Figure \ref{fig:sflux}).\begin{figure}[hbtp]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/sflux.png}
     \caption{Example of contents for sflux folder, also showing the contents the file sflux\_inputs.txt}
@@ -434,7 +433,7 @@ if ics=2, x,y are degr in lon/lat. #ics is defined in param.nml
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Bulk parameters}
-\noindent For IBOUNDFORMAT=2: write the name of the 5 nc files in a file called 'bndfiles.dat', \hl{the order is very important, to be confirmed someone???}: \begin{enumerate}
+\noindent For IBOUNDFORMAT=2: write the name of the 5 nc files in a file called 'bndfiles.dat', \hl{the order is very important, to confirm someone? I have not yet managed to get this option to work in v5.8.}: \begin{enumerate}
     \item dir
     \item fp
     \item hs
@@ -458,8 +457,8 @@ Important items to check:
     \item LBCSP= T (Specify (non-parametric) wave spectra, specified in 'FILEWAVE' below)
 \end{itemize}
 
-For IBOUNDFORMAT=3, you have to specify the names of binary files \hl{@Xavier: could you add information here please?}
-%%%%%%%%%%%%%%%%%%%%%%%%
+For IBOUNDFORMAT=3, you have to specify the names of binary files \hl{If anyone could add any information here please that would be great.}
+%%%%%%%%%%%%%%%%%%%%%
 \subsection{Mandatory file wwmbnd.gr3}
 \noindent For wwmbnd.gr3, it's a .gr3 style, you have to change the depth variable as follows:
 \begin{enumerate}
