@@ -1,3 +1,4 @@
+# @author: Krys1202
 #Create wwmbnd.gr3 based on SELFE open bnd segments
 import csv
 import numpy as nu
