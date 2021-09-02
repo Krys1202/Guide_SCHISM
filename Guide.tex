@@ -354,10 +354,11 @@ cdo merge [].nc [].nc [].nc sflux.nc
 Then change the time units to "days since start\_date" with cdo  (before it was hours since 1880):
 \begin{lstlisting}[language=bash]
 cdo -setreftime,'2018-03-16','00:00:00' sflux.nc sflux_new.nc 
-cdo -settunits,day sflux_new.nc sflux_air_1.0001.nc 
+cdo -settunits,day sflux_new.nc sflux_air.nc 
 OR in one command
-cdo -setreftime,'2018-03-16','00:00:00',day sflux.nc sflux_air_1.0001.nc 
+cdo -setreftime,'2018-03-16','00:00:00',day sflux.nc sflux_air.nc 
 \end{lstlisting}
+Now you need to put all these variables in a new NetCDF compatible for SCHISM (sflux\_air\_1.0001.nc), using the script in Appendix A.1.
 Put the file created in a folder "sflux" with a file "sflux\_inputs.txt" (In this file advanced users can specify parameters like renaming variable names, resetting max time window etc. Most users won't bother about these), and this folder in the folder of your run (Figure \ref{fig:sflux}).\begin{figure}[hbtp]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/sflux.png}
@@ -382,7 +383,7 @@ Then change the reftime  to start\_time and units to seconds.
 \begin{lstlisting}
 cdo -setreftime,'YYYY-MM-DD','HH:MM:SS',second yourfile.nc elev.nc\
 \end{lstlisting}
-Run the python script "ElevUV\_bnb.py" (see Appendix A.1) to produce the "elev.th.nc" file for elevation. Then in bctides.in change the options for elevation: here 5 instead of 3, so the last line of Figure \ref{fig:caseBC} will become 748 5 3 0 0. Reminder all options for bctides are explained in table 4.1 of the manual.\\
+Run the python script "ElevUV\_bnb.py" (see Appendix A.2) to produce the "elev.th.nc" file for elevation. Then in bctides.in change the options for elevation: here 5 instead of 3, so the last line of Figure \ref{fig:caseBC} will become 748 5 3 0 0. Reminder all options for bctides are explained in table 4.1 of the manual.\\
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/elevbc.png}
@@ -440,7 +441,7 @@ if ics=2, x,y are degr in lon/lat. #ics is defined in param.nml
     \item spr
     \item t02
 \end{enumerate}
-Copy these files in your folder for the run. Create wwwbnd.gr3 with python script (see Appendix A.2), and update param.nml to add the WWM global outputs: example in folder Test\_WWM\_Analytical (test suite : schism\_verification\_tests) and to ensure msc2 and mdc2 are equal to values in wwminput.nml.\\
+Copy these files in your folder for the run. Create wwwbnd.gr3 with python script (see Appendix A.3), and update param.nml to add the WWM global outputs: example in folder Test\_WWM\_Analytical (test suite : schism\_verification\_tests) and to ensure msc2 and mdc2 are equal to values in wwminput.nml.\\
 Important items to check:
 \begin{itemize}
     \item INITSTYLE= 1 (parametric Jonswap)
@@ -467,7 +468,7 @@ For IBOUNDFORMAT=3, you have to specify the names of binary files \hl{If anyone 
     \item put -1 for island boundary
     \item put 2 for open boundary
 \end{enumerate}
-To create this file you can find a fortran script under github, a matlab script in the archives of schism\_users lists, and a python script in Appendix A.2.
+To create this file you can find a fortran script under github, a matlab script in the archives of schism\_users lists, and a python script in Appendix A.3.
 There may be some duplicated nodes that are between land and open boundaries, you can manually work out to remove and keep the correct one.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Data for bulk parameters}
@@ -539,7 +540,7 @@ The variables to download are:
 \end{itemize}
 \subsubsection{Ifremer data}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\noindent Ftp links (\url{ftp.ifremer.fr}) must be open in a dedicated software (like filezilla for linux) or you can use the python script "ncget.py" in Appendix A.3.\\
+\noindent Ftp links (\url{ftp.ifremer.fr}) must be open in a dedicated software (like filezilla for linux) or you can use the python script "ncget.py" in Appendix A.4.\\
 Example of path: \\
 $/ifremer/ww3/HINDCAST/GLOBMULTI\_ECMWF\_02/GLOB-30M/2018/SPEC\_SE$\\
 Time period for:
@@ -640,6 +641,135 @@ Global output is done every "nspool" steps, and a new output stack is opened eve
 \section{}
 These scripts are in Github: \url{https://github.com/Krys1202/Guide_SCHISM/tree/main/Python_scripts}
 \unskip
+\subsection{Python script to create sflux air 1.0001.nc}
+\begin{minted}{python}
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr 21 14:41:09 2021
+@author: Christelle Auguste inspired by "gfs.py" from pyschism and matlab scripts in src/Utility
+"""
+from netCDF4 import Dataset,num2date
+from datetime import datetime
+import numpy as np
+
+#define your domain
+lon_points = np.arange(lon value,lon value,0.25)
+lat_points = np.arange(lat value,lat value,0.25)
+lon , lat = np.meshgrid(lon_points, lat_points)
+
+##create new netcdf
+filename = 'sflux_air_1.0001.nc'
+#nc = Dataset(filename, 'w', format='NETCDF4')
+nc = Dataset(filename, 'w', format='NETCDF3_CLASSIC')
+nc.setncatts({"Conventions": "CF-1.0"})
+nc.createDimension('time', None)
+nc.createDimension('ny_grid', len(lat_points)) 
+nc.createDimension('nx_grid', len(lon_points)) 
+
+lon_var = nc.createVariable('lon', np.float32, dimensions=('ny_grid','nx_grid'),)
+lon_var[:]= lon
+lon_var.units = 'degrees_east'
+#lon_var.axis = 'X' # Optional
+lon_var.standard_name = 'longitude'
+lon_var.long_name = 'Longitude'
+
+lat_var = nc.createVariable('lat', np.float32, ('ny_grid','nx_grid'),)
+lat_var[:] = lat
+lat_var.units = 'degrees_north'
+#at_var.axis = 'Y' # Optional
+lat_var.standard_name = 'latitude'
+lat_var.long_name = 'Latitude'
+
+
+time_units='days since 20XX-XX-XX'
+time_var = nc.createVariable('time', np.float32, ('time',))
+time_var.units = time_units
+#time_var.axis = 'T'  # Optional
+time_var.standard_name = 'time' 
+time_var.long_name = 'Time'
+time_var.base_date=(20XX, XX, XX, 0)
+
+prmsl_var = nc.createVariable('prmsl', datatype=np.float32,
+                              dimensions=('time', 'ny_grid', 'nx_grid'),
+                              zlib=True)
+prmsl_var.units = 'Pa'
+prmsl_var.standard_name = 'Pressure reduced to MSL'
+prmsl_var.long_name = 'air_pressure_at_sea_level'
+prmsl_var.missing_value = -9999
+
+uwind_var = nc.createVariable('uwind', datatype=np.float32,
+                              dimensions=('time', 'ny_grid', 'nx_grid'),
+                              zlib=True)
+uwind_var.units = 'm/s'
+uwind_var.standard_name = 'eastward_wind'
+uwind_var.long_name = 'Surface Eastward Air Velocity (10m AGL)'
+
+vwind_var = nc.createVariable('vwind', datatype=np.float32,
+                              dimensions=('time', 'ny_grid', 'nx_grid'),
+                              zlib=True)
+vwind_var.units = 'm/s'
+vwind_var.standard_name = 'northward_wind'
+vwind_var.long_name = 'Surface Northward Air Velocity (10m AGL)'
+
+stmp_var = nc.createVariable('stmp', datatype=np.float32,
+                              dimensions=('time', 'ny_grid', 'nx_grid'),
+                              zlib=True)
+stmp_var.units = 'K'
+stmp_var.standard_name = 'air_temperature'
+stmp_var.long_name = 'Surface Air Temperature (2m AGL)'
+
+spfh_var = nc.createVariable('spfh', datatype=np.float32,
+                              dimensions=('time', 'ny_grid', 'nx_grid'),
+                              zlib=True)
+spfh_var.units = '1'
+spfh_var.standard_name = 'specific_humidity'
+spfh_var.long_name = 'Surface Specific Humidity (2m AGL)'
+    
+#Fill the new nc file with GFS 0.25deg data (combined in one nc file)
+d  = Dataset('sflux_air.nc')    
+tvar = 'initial_time0_hours'
+t = d[tvar][:]
+t_unit = d.variables[tvar].units
+print(t_unit)
+tvals = num2date(t,units = t_unit)
+
+str_t = [i.strftime('%Y%m%d %H%M') for i in tvals] 
+#to display dates as string
+datetime_t = [datetime.strptime(i,"%Y%m%d %H%M") for i in str_t]
+# print(str_t)
+# print(datetime_t)
+time_var[:]= t
+
+pvar = 'PRMSL_P0_L101_GLL0'
+prmsl=d[pvar][:][:][:]
+print(prmsl.shape)
+prmsl_var[:,:,:] = prmsl 
+
+uvar = 'UGRD_P0_L103_GLL0'
+uwind = d[uvar][:][:][:]
+print(uwind.shape)
+uwind_var[:,:,:] = uwind 
+
+vvar = 'VGRD_P0_L103_GLL0'
+vwind = d[vvar][:][:][:]
+print(vwind.shape)
+vwind_var[:,:,:] = vwind 
+
+sphvar = 'SPFH_P0_L103_GLL0'
+sph = d[sphvar][:][:][:]
+print(sph.shape)
+spfh_var[:,:,:] = sph
+
+stmpvar = 'TMP_P0_L103_GLL0'
+stmp = d[stmpvar][:][:][:]
+print(stmp.shape)
+stmp_var[:,:,:] = stmp 
+d.close()
+nc.close()
+\end{minted}
+\clearpage
+%%%%%%%%%%%%%
 \subsection{Python script to create elev2D.th.nc}
 \begin{minted}{python}
 from netCDF4 import Dataset,num2date
