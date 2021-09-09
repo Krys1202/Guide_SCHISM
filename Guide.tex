@@ -819,7 +819,7 @@ nodeLont=[]
 nodeLatt=[]
 for i in range(len(openbnd_lines)):
         node_index = int(openbnd_lines[i])
-        node= node_lines[node_index+2]
+        node= node_lines[node_index-1]
         #node_num=node[0:5]
         node_lont=node.split(" ")[5]
         node_latt=node.split(" ")[10]
