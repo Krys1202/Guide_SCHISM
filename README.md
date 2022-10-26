@@ -8,3 +8,10 @@ This guide is primarily aimed at implementing SCHISM on a Linux platform, althou
 
 This project is synced with Overleaf:  https://www.overleaf.com/4263985246xmrwvdzmjtvs
 (Creation of an account is free.)
+
+Update January 2022
+The shared Overleaf version is no longer available (end of paid subscription), same for synchronization with Github.
+The last version of the beginner guide is in .pdf and .tex.
+
+Let me know if you want to contribute to this guide.
+
