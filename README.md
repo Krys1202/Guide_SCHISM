@@ -14,5 +14,8 @@ Update January 2022:
 The shared Overleaf version is no longer available (end of paid subscription), same for synchronization with Github.
 The last version of the beginner guide is in .pdf and .tex.
 
+Update Ocotber 2022:
+
 Let me know if you want to contribute to this guide.
+Contact: christelle.auguste@utas.edu.au 
 
