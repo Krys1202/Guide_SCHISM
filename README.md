@@ -1,4 +1,4 @@
-# Guide_SCHISM
+# Guide_SCHISM (August 2021)
 This guide could be an appendix to the SCHISM manual available at: http://ccrm.vims.edu/schismweb/SCHISM_v5.8-Manual.pdf. 
 It was written to help beginners better deal with SCHISM v5.8 and the different steps to run simulations. 
 It aims to try to gather as much information and links as possible on how to produce the input files in one place for 2D barotropic model and only for hindcast data studies. 
@@ -9,7 +9,8 @@ This guide is primarily aimed at implementing SCHISM on a Linux platform, althou
 This project is synced with Overleaf:  https://www.overleaf.com/4263985246xmrwvdzmjtvs
 (Creation of an account is free.)
 
-Update January 2022
+Update January 2022:
+
 The shared Overleaf version is no longer available (end of paid subscription), same for synchronization with Github.
 The last version of the beginner guide is in .pdf and .tex.
 
