@@ -113,23 +113,34 @@ time_var[:]= t
 ######### need to find the values for lon/lat of openbnb =bnd_coord
 
 nc=xr.open_dataset('merc-all-201012-1bis.nc') 
-subset=nc.sel(longitude=bnd_coord[:,0], latitude=bnd_coord[:,1], method='nearest')
-SSH=nc.zos
-# #########elev2D
-elev_test=subset.zos.values
-elev_test2=np.zeros([len(t),len(bnd_coord)])
+latitude=nc['latitude']
+longitude=nc['longitude']
+uo=nc['uo']
+vo=nc['vo']
+zos=nc.zos
+t,nr,nco=zos.shape
 
-for j in range(len(t)):
-    for i in range(len(bnd_coord)):
-      elev_test2[j,i] = elev_test[j,i,i]
+#identify the positions for each node on the boundary
+long_mesh = np.meshgrid(longitude, latitude, indexing='xy')[0]
+lat_mesh = np.meshgrid(longitude, latitude, indexing='xy')[1]
+positions = [near2d_unstruct(long_mesh.flatten(), lat_mesh.flatten(), 
+                         lons,lats)for lons,lats in zip(bnd_coordF[:,0], bnd_coordF[:,1])]
+             
 
-#put nan values=0
-elev_nonan=np.nan_to_num(elev_test2)
-SE_RES=np.mean(elev_nonan)
-SSH=elev_nonan-SE_RES
+i_columns = [i % nco for i in positions]
+i_rows = [math.floor(i / nco) for i in positions]
 
-elev_var[:,:,:,:] = SSH
+elevation=zos.to_dataframe().fillna(method='ffill').to_xarray().zos.values
 
+#remove the mean for Mercator files 
+elevationM=np.nanmean(elevation, axis=0)
+elevationRes=elevation-elevationM
+
+elevation_bnd=elevationRes[:, i_rows, i_columns]
+
+###### Fill netcdf
+
+elev_var[:,:,:,:] = elevation_bnd
 
 
 d.close()
