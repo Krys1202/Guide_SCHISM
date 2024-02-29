@@ -1,4 +1,4 @@
-# Guide_SCHISM (August 2021)
+# Guide_SCHISM 
 This guide could be an appendix to the SCHISM manual available at: http://ccrm.vims.edu/schismweb/SCHISM_v5.8-Manual.pdf. 
 It was written to help beginners better deal with SCHISM v5.8 and the different steps to run simulations. 
 It aims to try to gather as much information and links as possible on how to produce the input files in one place for 2D barotropic model and only for hindcast data studies. 
