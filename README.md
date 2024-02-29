@@ -20,4 +20,4 @@ Let me know if you want to contribute to this guide.
 Contact: christelle.auguste@utas.edu.au 
 
 March 2024:
-Updates of python scripts
+Updates of the Guide and python scripts
