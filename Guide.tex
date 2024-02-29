@@ -10,7 +10,7 @@
 % article
 %---------
 % The default type of manuscript is "article", but can be replaced by: 
-% abstract, addendum, article, benchmark, book, bookreview, briefreport, casereport, changes, comment, commentary, communication, conceptpaper, conferenceproceedings, correction, conferencereport, expressionofconcern, extendedabstract, meetingreport, creative, datadescriptor, discussion, editorial, essay, erratum, hypothesis, interestingimages, letter, meetingreport, newbookreceived, obituary, opinion, projectreport, reply, retraction, review, perspective, protocol, shortnote, supfile, technicalnote, viewpoint
+% abstract, addendum, article, benchmark, book, bookrevhttps://www.overleaf.com/project/6122fe048b59c97d57109608iew, briefreport, casereport, changes, comment, commentary, communication, conceptpaper, conferenceproceedings, correction, conferencereport, expressionofconcern, extendedabstract, meetingreport, creative, datadescriptor, discussion, editorial, essay, erratum, hypothesis, interestingimages, letter, meetingreport, newbookreceived, obituary, opinion, projectreport, reply, retraction, review, perspective, protocol, shortnote, supfile, technicalnote, viewpoint
 % supfile = supplementary materials
 
 %----------
@@ -191,6 +191,15 @@ If your bathymetry is negative, transform it with xmgredit5:
 Then: Edit/Edit over regions/Evaluate and then in the dialogue box type depth=depth*(-1).\\
 Beware of CFL number condition, being an implicit model SCHISM require CFL$>$0.4 (see manual part 5.1.1 \& 5.1.2). The general rules are well explained in the section 5.1 of the manual.
 %%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Mesh creation with SMS}
+Import your coastline and bathymetry, clean it, redistribute nodes, then create Polygon select paving for the mesh and none for the islands.\\
+Once your mesh is created you have to export it in SMS format(.2dm). Then you can convert it to .gr3 using the perl script "2dm2gr3\_m2m.pl" (link : $schism/src/Utility/SMS$) with the following commands:
+\begin{lstlisting}[language=bash]
+$ ./2dm2gr3_m2m.pl [version of SMS 0 1 2] [yourfile.2dm] [hgrid.gr3]
+\end{lstlisting}
+With the version of SMS 13.2: 1\\
+Follow the same steps as above if the bathymetry is negative.
+
 \subsubsection{Option optimization with nicegrid}
 You can optimize your mesh with the tool nicegrid2 (\url{https://adcirc.org/home/related-software/adcirc-utility-programs/},download then compile), example is shown in Figure \ref{fig:nicegrid}.
 \begin{figure}[htbp]
@@ -202,7 +211,7 @@ You can optimize your mesh with the tool nicegrid2 (\url{https://adcirc.org/home
 %%%%%%%%%%%%%%%%%
 \subsubsection{Define boundaries}
 \noindent Boundaries can be defined easily with xmgredit5. You have to define the boundaries (anti-clockwise) see this GIF for all the steps: \\
-\url{http://ccrm.vims.edu/yinglong/feiye/Workshop_20190701/TEMP/Doc/hgrid.html}\\
+\url{http://ccrm.vims.edu/yinglong/feiye/Workshop_20190701/TEMP/Doc/bnd.gif}\\
 Save file as bnb file. And check at the interface open bnd/land that the nodes are well defined.
 %%%%%%%%%%%%%%
 \subsubsection{Completion of hgrid.gr3, hgrid.ll as required for SCHISM}
@@ -246,14 +255,12 @@ S levels
 %%%%%%%%%%%%%%%%%%%
 \subsection{Mandatory file bctides.in}
 \noindent All the options supported by SCHISM are described in the section 4.2.3 of the manual. A good description of the file is available with this link:\\
-\url{http://ccrm.vims.edu/yinglong/feiye/Workshop_20190701/TEMP/Doc/bc.html}
+\url{http://ccrm.vims.edu/yinglong/feiye/Workshop_20190701/TEMP/Doc/bnd.gif}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Matlab}
-\noindent You have a matlab code "one\_click\_bctides\_schism\_fes2014" in folder $schism/src/Utility/Tides$ to create bctides with FES2014 data. First you have to download the FES2014 data, e.g. from \url{https://www.aviso.altimetry.fr/en/data/products/auxiliary-products/global-tide-fes/}.
-%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Python}
+\subsubsection{Python old way}
 \noindent For TPXO there is the possibility to use pychsim developed by Jaime Cazalda:\\ \url{https://github.com/schism-dev/pyschism}\\
-After installation, the cmd line to have information:
+After installation in a virtual environment, the cmd line to have information:
 \begin{lstlisting}
 $ pyschism  bctides -h
 usage: pyschism bctides [-h] [--output-file OUTPUT_FILE] [--include-velocity]
@@ -276,6 +283,7 @@ optional arguments:
   --overwrite           Allow overwrite of output file.
   --log-level {critical,fatal,error,warn,warning,info,debug,notset,
   detail,partitioning}
+ 
   \end{lstlisting}
 After downloading the data from TPXO (i.e. from \url{https://www.tpxo.net/}: h\_tpxo9.v1.nc and u\_tpxo9.v1.nc), copy the netcdf TPXO files to \$Home/.local/tpxo/*.nc and then you can create the "bctides.in" file:
 \begin{lstlisting}
@@ -292,6 +300,12 @@ This will put into "bctides.in" for each constituent requested:
     \item nodal factor and earth equilibrium argument (varying with time)
     \item amplitude and phases of constituents at the boundaries (varying with space)
 \end{itemize}
+
+\subsubsection{Python with script}
+We used tpxo9 version 5a for our preparation of tidal boundary conditions. The following steps show the preparation of tidal boundary condition with two ocean boundaries. \\
+First we need to register and download h\_tpxo9.v*.nc and u\_tpxo9.v*.nc files.
+If you are using a version different from v1 you have to rename the files to *\_v1.nc so that they are recognised by pyschism (for now only using v1). \newline
+Copy the renamed files in /home/xxx/.local/share/tpxo/ and use bctides\_script.py  (\url{https://github.com/Krys1202/Guide_SCHISM/tree/main/Python_scripts}) to generate the bctides.in file. 
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Mandatory file "bed roughness".gr3}
 \noindent Information at:\\
@@ -329,7 +343,7 @@ We recommend dzb_decay=0.
 Others useful links: \\
 \url{http://ccrm.vims.edu/w/index.php/Atmospheric_forcing}\\
 \url{http://ccrm.vims.edu/yinglong/feiye/Workshop_20190701/TEMP/Doc/sflux.html}\\
-
+\subsubsection{GFS}
 \noindent Here is underlined the method to create sflux\_air only with python from GFS data.\\
 %Get the files for hindcast:
 %\urlstyle{https://www.ncei.noaa.gov/thredds/model/gfs.html}
@@ -353,7 +367,7 @@ cdo merge [].nc [].nc [].nc sflux.nc
 \end{lstlisting}
 Then change the time units to "days since start\_date" with cdo  (before it was hours since 1880):
 \begin{lstlisting}[language=bash]
-cdo -setreftime,'2018-03-16','00:00:00' sflux.nc sflux_new.nc 
+cdo -setreftime,2018-03-16,00:00:00 sflux.nc sflux_new.nc 
 cdo -settunits,day sflux_new.nc sflux_air.nc 
 OR in one command
 cdo -setreftime,'2018-03-16','00:00:00',day sflux.nc sflux_air.nc 
@@ -365,7 +379,21 @@ Put the file created in a folder "sflux" with a file "sflux\_inputs.txt" (In thi
     \caption{Example of contents for sflux folder, also showing the contents the file sflux\_inputs.txt}
     \label{fig:sflux}
 \end{figure} \newline
-Then create the file windrot\_geo2proj.gr3 : it's hgrid.gr3 with rotation value instead of depth . It rotates the wind in case they do not align with coordinates axes. If no rotation is needed put 0: you can use xmgredit5 for that by changing all values of 'depth' to 0 and saving it as windrotgeoproj.gr3.\\
+\subsubsection{ERA5}
+Please install pyschism before proceeding. Here, an example of preparing ERA5 input forcing for 10 days is shown. Downloading ERA5 files and preparing sflux files can be done at the same time using this method.
+\begin{itemize}
+    \item Register an account in Climate data store (CDS) API 
+    \item  Login to CDS API and save the url, uid and api-key information for your account (this can be found in the profile section of your account)
+    \item Create a file .cdsapirc in your home directory (cmd:vi HOME/.cdsapirc). Then fill in: url +uid +api information.\newline
+    EX:url: https://cds.climate.copernicus.eu/api/v2 \newline
+    key: {uid}:{api-key}
+    \item Install cdsapi library: pip3 install cdsapi
+    \item use the script ERA5.py (\url{https://github.com/Krys1202/Guide_SCHISM/tree/main/Python_scripts})
+\end{itemize}
+Please note that, using this method, there is a file download limit from CDS API for hourly data up to 120,000 at a time. If we exceed the limit, we will have to download the files manually. An example of downloading ERA5 files using CDS API is also given  with the script CDS.py
+
+\subsubsection{windrot\_geoproj file}
+Last file to be created for the atmospheric forcing is the file windrot\_geo2proj.gr3: it's hgrid.gr3 with rotation value instead of depth . It rotates the wind in case they do not align with coordinates axes. If no rotation is needed put 0: you can use xmgredit5 for that by changing all values of 'depth' to 0 and saving it as windrotgeoproj.gr3.\\
 If you use this option don't forget to put nws=2 in param.nml.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -381,9 +409,9 @@ If you use this option don't forget to put nws=2 in param.nml.
 %(script "download-phys.py", just need to update the dates.)\\
 Then change the reftime  to start\_time and units to seconds.
 \begin{lstlisting}
-cdo -setreftime,'YYYY-MM-DD','HH:MM:SS',second yourfile.nc elev.nc\
+cdo -setreftime,YYYY-MM-DD,HH:MM:SS,second yourfile.nc elev.nc\
 \end{lstlisting}
-Run the python script "ElevUV\_bnb.py" (see Appendix A.2) to produce the "elev.th.nc" file for elevation. Then in bctides.in change the options for elevation: here 5 instead of 3, so the last line of Figure \ref{fig:caseBC} will become 748 5 3 0 0. Reminder all options for bctides are explained in table 4.1 of the manual.\\
+Run the python script "Elev2D\_th.py" (see Github) to produce the "elev.th.nc" file for elevation. Then in bctides.in change the options for elevation: here 5 instead of 3, so the last line of Figure \ref{fig:caseBC} will become 748 5 3 0 0. Reminder all options for bctides are explained in table 4.1 of the manual.\\
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/elevbc.png}
@@ -468,7 +496,7 @@ Important items to check:
     \item put 2 for open boundary with Dirichlet conditions
     \item put 3 for open boundary with Neumann conditions (i.e. zero gradient)
 \end{enumerate}
-To create this file you can find a fortran script under github, a matlab script in the archives of schism\_users lists, and a python script in Appendix A.3.
+To create this file you can find a fortran script under github, a matlab script in the archives of schism\_users lists, and a python script (see Github).
 There may be some duplicated nodes that are between land and open boundaries, you can manually work out to remove and keep the correct one.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Data for bulk parameters}
@@ -540,7 +568,7 @@ The variables to download are:
 \end{itemize}
 \subsubsection{Ifremer data}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\noindent Ftp links (\url{ftp.ifremer.fr}) must be open in a dedicated software (like filezilla for linux) or you can use the python script "ncget.py" in Appendix A.4.\\
+\noindent Ftp links (\url{ftp.ifremer.fr}) must be open in a dedicated software (like filezilla for linux) or you can use the python script "ncget.py" (see Github).\\
 Example of path: \\
 $/ifremer/ww3/HINDCAST/GLOBMULTI\_ECMWF\_02/GLOB-30M/2018/SPEC\_SE$\\
 Time period for:
@@ -642,7 +670,7 @@ This imply x1,x2,x3 are opposite, i.e. clockwise instead of anticlockwise in you
 \newline
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\acknowledgments{Thanks to Xavier Bertin, Joseph Zhang, Vanessa Hernaman, Jerome Lefevre, Ivica Janekovic, Jaime Calzada, Huy Quang Tran and Roger Proctor. }
+\acknowledgments{Thanks to Xavier Bertin, Joseph Zhang, Vanessa Hernaman, Jerome Lefevre, Ivica Janekovic, Jaime Calzada, Huy Quang Tran, Chinglen Meetei Tensubam and Roger Proctor. }
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -652,484 +680,6 @@ This imply x1,x2,x3 are opposite, i.e. clockwise instead of anticlockwise in you
 \section{}
 These scripts are in Github: \url{https://github.com/Krys1202/Guide_SCHISM/tree/main/Python_scripts}
 \unskip
-\subsection{Python script to create sflux air 1.0001.nc}
-\begin{minted}{python}
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Apr 21 14:41:09 2021
-@author: Christelle Auguste inspired by "gfs.py" from pyschism and matlab scripts in src/Utility
-"""
-from netCDF4 import Dataset,num2date
-from datetime import datetime
-import numpy as np
-
-#define your domain
-lon_points = np.arange(lon value,lon value,0.25)
-lat_points = np.arange(lat value,lat value,0.25)
-lon , lat = np.meshgrid(lon_points, lat_points)
-
-##create new netcdf
-filename = 'sflux_air_1.0001.nc'
-#nc = Dataset(filename, 'w', format='NETCDF4')
-nc = Dataset(filename, 'w', format='NETCDF3_CLASSIC')
-nc.setncatts({"Conventions": "CF-1.0"})
-nc.createDimension('time', None)
-nc.createDimension('ny_grid', len(lat_points)) 
-nc.createDimension('nx_grid', len(lon_points)) 
-
-lon_var = nc.createVariable('lon', np.float32, dimensions=('ny_grid','nx_grid'),)
-lon_var[:]= lon
-lon_var.units = 'degrees_east'
-#lon_var.axis = 'X' # Optional
-lon_var.standard_name = 'longitude'
-lon_var.long_name = 'Longitude'
-
-lat_var = nc.createVariable('lat', np.float32, ('ny_grid','nx_grid'),)
-lat_var[:] = lat
-lat_var.units = 'degrees_north'
-#at_var.axis = 'Y' # Optional
-lat_var.standard_name = 'latitude'
-lat_var.long_name = 'Latitude'
-
-
-time_units='days since 20XX-XX-XX'
-time_var = nc.createVariable('time', np.float32, ('time',))
-time_var.units = time_units
-#time_var.axis = 'T'  # Optional
-time_var.standard_name = 'time' 
-time_var.long_name = 'Time'
-time_var.base_date=(20XX, XX, XX, 0)
-
-prmsl_var = nc.createVariable('prmsl', datatype=np.float32,
-                              dimensions=('time', 'ny_grid', 'nx_grid'),
-                              zlib=True)
-prmsl_var.units = 'Pa'
-prmsl_var.standard_name = 'Pressure reduced to MSL'
-prmsl_var.long_name = 'air_pressure_at_sea_level'
-prmsl_var.missing_value = -9999
-
-uwind_var = nc.createVariable('uwind', datatype=np.float32,
-                              dimensions=('time', 'ny_grid', 'nx_grid'),
-                              zlib=True)
-uwind_var.units = 'm/s'
-uwind_var.standard_name = 'eastward_wind'
-uwind_var.long_name = 'Surface Eastward Air Velocity (10m AGL)'
-
-vwind_var = nc.createVariable('vwind', datatype=np.float32,
-                              dimensions=('time', 'ny_grid', 'nx_grid'),
-                              zlib=True)
-vwind_var.units = 'm/s'
-vwind_var.standard_name = 'northward_wind'
-vwind_var.long_name = 'Surface Northward Air Velocity (10m AGL)'
-
-stmp_var = nc.createVariable('stmp', datatype=np.float32,
-                              dimensions=('time', 'ny_grid', 'nx_grid'),
-                              zlib=True)
-stmp_var.units = 'K'
-stmp_var.standard_name = 'air_temperature'
-stmp_var.long_name = 'Surface Air Temperature (2m AGL)'
-
-spfh_var = nc.createVariable('spfh', datatype=np.float32,
-                              dimensions=('time', 'ny_grid', 'nx_grid'),
-                              zlib=True)
-spfh_var.units = '1'
-spfh_var.standard_name = 'specific_humidity'
-spfh_var.long_name = 'Surface Specific Humidity (2m AGL)'
-    
-#Fill the new nc file with GFS 0.25deg data (combined in one nc file)
-d  = Dataset('sflux_air.nc')    
-tvar = 'initial_time0_hours'
-t = d[tvar][:]
-t_unit = d.variables[tvar].units
-print(t_unit)
-tvals = num2date(t,units = t_unit)
-
-str_t = [i.strftime('%Y%m%d %H%M') for i in tvals] 
-#to display dates as string
-datetime_t = [datetime.strptime(i,"%Y%m%d %H%M") for i in str_t]
-# print(str_t)
-# print(datetime_t)
-time_var[:]= t
-
-pvar = 'PRMSL_P0_L101_GLL0'
-prmsl=d[pvar][:][:][:]
-print(prmsl.shape)
-prmsl_var[:,:,:] = prmsl 
-
-uvar = 'UGRD_P0_L103_GLL0'
-uwind = d[uvar][:][:][:]
-print(uwind.shape)
-uwind_var[:,:,:] = uwind 
-
-vvar = 'VGRD_P0_L103_GLL0'
-vwind = d[vvar][:][:][:]
-print(vwind.shape)
-vwind_var[:,:,:] = vwind 
-
-sphvar = 'SPFH_P0_L103_GLL0'
-sph = d[sphvar][:][:][:]
-print(sph.shape)
-spfh_var[:,:,:] = sph
-
-stmpvar = 'TMP_P0_L103_GLL0'
-stmp = d[stmpvar][:][:][:]
-print(stmp.shape)
-stmp_var[:,:,:] = stmp 
-d.close()
-nc.close()
-\end{minted}
-\clearpage
-%%%%%%%%%%%%%
-\subsection{Python script to create elev2D.th.nc}
-\begin{minted}{python}
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue May  4 11:42:35 2021
-
-@author: christelle
-"""
-from netCDF4 import Dataset,num2date
-from datetime import datetime
-import numpy as np
-import xarray as xr
-#import pandas as pd
-
-# get lon/lat of open boundaries nodes from hgrid.ll
-f=open('hgrid_principal.ll','r')
-data=f.readlines()
-
-num_nodes_and_elements = data[1]
-num_nodes = num_nodes_and_elements.split(" ")[1]
-num_elements= num_nodes_and_elements.split(" ")[0]
-
-nodes_start = 2
-node_lines = data[nodes_start:nodes_start+int(num_nodes)]
-
-elements_start = nodes_start + int(num_nodes) 
-element_lines = data[elements_start:elements_start + int(num_elements)]
-
-metadata1_start = elements_start + int(num_elements) 
-metadata1_line = data[metadata1_start:metadata1_start + 3]
-metadata_obnb=data[metadata1_start+1]
-numnodes_obnb=metadata_obnb.split(" ")[0] #to have total number of nodes in open bnd
-metadata_obnb1=data[metadata1_start+2]
-numnodes_obnb1=metadata_obnb1.split(" ")[0] 
-
-obnodes1_start =metadata1_start+ 3
-obnnode1_lines=data[obnodes1_start:obnodes1_start+int(numnodes_obnb1)]
-
-metadata2_start = obnodes1_start + int(numnodes_obnb1)
-metadata_obnb2=data[metadata2_start]
-numnodes_obnb2=metadata_obnb2.split(" ")[0]
-
-#only one open bnd in this case
-# obnodes2_start =metadata2_start+ 1
-# obnnode2_lines=data[obnodes2_start:obnodes2_start+int(numnodes_obnb2)]
-
-
-openbnd_lines=obnnode1_lines#+obnnode2_lines #all the lines for all nodes in open bnd
-
-#get the coordinates corresponding to the open bnd nodes
-bnd_coord=[]
-nodeLon=[]
-nodeLat=[]
-nodeLont=[]
-nodeLatt=[]
-for i in range(len(openbnd_lines)):
-        node_index = int(openbnd_lines[i])
-        node= node_lines[node_index-1]
-        #node_num=node[0:5]
-        node_lont=node.split(" ")[5]
-        node_latt=node.split(" ")[10]
-        #append lon, lat
-        nodeLont.append(node_lont)
-        nodeLatt.append(node_latt)
-
-bnd_coord= np.column_stack([nodeLont, nodeLatt])
-
-nOpenBnbNodes=int(numnodes_obnb)
-
-##create new netcdf elev2D.th.nc
-filename = 'elev2D_RES.th.nc'
-nc_elev = Dataset(filename, 'w', format='NETCDF4')
-#nc_elev = Dataset(filename, 'w', format='NETCDF3_CLASSIC')
-nc_elev.setncatts({"Conventions": "CF-1.0"})
-nc_elev.createDimension('time', None)
-nc_elev.createDimension('nComponents', 1) 
-nc_elev.createDimension('nLevels', 1) 
-nc_elev.createDimension('nOpenBndNodes', len(bnd_coord)) #nOpenBnbNodes
-nc_elev.createDimension('one', 1) 
-
-one=1
-
-time_var = nc_elev.createVariable('time', np.double, ('time',))
-time_var.units = 's'
-time_var.long_name = 'simulation time in seconds'
-
-
-timestep_var = nc_elev.createVariable('time_step', np.float32, 'one')
-timestep_var.units = 's'
-timestep_var.long_name = 'time step in seconds'
-timestep_var[:]= 86400
-
-
-elev_var = nc_elev.createVariable('time_series',np.float32,('time','nOpenBndNodes',
-                              'nLevels', 'nComponents'),)
-elev_var.long_name = 'elev_nontidal'
-elev_var.units='m'
-
-
-
-################Fill the new nc files with Mercator data ( ex 1month  01/07/2018)
-d  = Dataset('merc-all-201012-1bis.nc') #modified from original version with 
-#cdo to have time in seconds
-tvar = 'time'
-t = d[tvar][:]
-t_unit = d.variables[tvar].units
-#print(t_unit)
-tvals = num2date(t,units = t_unit)
-str_t = [i.strftime("%Y%m%d %H%M") for i in tvals] # to display dates as string
-datetime_t = [datetime.strptime(i,"%Y%m%d %H%M") for i in str_t]
-time_var[:]= t
-
-
-######### need to find the values for lon/lat of openbnb =bnd_coord
-
-nc=xr.open_dataset('merc-all-201012-1bis.nc') 
-subset=nc.sel(longitude=bnd_coord[:,0], latitude=bnd_coord[:,1], method='nearest')
-SSH=nc.zos
-# #########elev2D
-elev_test=subset.zos.values
-elev_test2=np.zeros([len(t),len(bnd_coord)])
-
-for j in range(len(t)):
-    for i in range(len(bnd_coord)):
-      elev_test2[j,i] = elev_test[j,i,i]
-
-#put nan values=0
-elev_nonan=np.nan_to_num(elev_test2)
-SE_RES=np.mean(elev_nonan)
-SSH=elev_nonan-SE_RES
-
-elev_var[:,:,:,:] = SSH
-
-
-
-d.close()
-nc_elev.close()
-
-
-\end{minted}
-\clearpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Python script to create wwmbnd.gr3}
-\begin{minted}{python}
-#Create wwmbnd.gr3 based on SELFE open bnd segments
-import csv
-import numpy as nu
-
-#     Inputs:         
-#     hgrid.gr3, 
-#     gen_wwmbnd.in (see sample below)
-
-#     Output: wwmbnd.gr3
-
-#     python create_wwmbnd_gr3.py
-	
-#     Sample gen_wwmbnd.in
-#4 !ncond, i.e. number of conditions
-#1 2 2 !cond1 #seg flag ob
-#2 2 1 !cond2 #seg flag land
-#3 22 -1 !cond3 #seg flag island
-#4 99 0 !cond4 #dummy flag other nodes
-	
-#     Input files, info about flags for different boundaries
-#     conditions ordered as they appear in hgrid.gr3
-#     i.e. open, land, island
-#     condition #, # boundaries, flag for open boundary nodes
-#     condition #, # boundaries, flag for land boundary nodes
-#     condition #, # boundaries, flag for island boundary nodes
-#     condition #, # boundaries, flag for other nodes (set inside code as initial condition)
-
-f = open('gen_wwmbnd.in')
-bnd_in = f.readlines()
-f.close()
-
-ncond = int(bnd_in[0][0])
-print('number of node condition flags is',ncond,' these are:')
-for i in range(ncond):
-    ii=i+1
-    x = bnd_in[ii].split(' ')
-    #print(x)
-    print(f'condition {x[0]}, # boundaries {x[1]}, flag {x[2]}')
-
-#read in details from hgrid
-with open('hgrid.gr3') as f:
-    fr = csv.reader(f,delimiter=' ')
-    next(fr)
-    nenp = next(fr)
-    #initialise arrays (ne = number of elements; np = number of nodes)
-    #xnd = lond, ynd = lat, ibnd = node number, nm = 3 nodes numbers per element 
-    ne = int(nenp[0])
-    np = int(nenp[1].strip())
-    xnd =nu.zeros([np])
-    ynd =nu.zeros([np])
-    ibnd=nu.zeros([np], dtype='i')
-    nm=nu.zeros([ne,3], dtype='i')
-
-    print(ne,np,nm.shape)
-
-    #read in xnd,ynd for each node
-    for i in range(np):
-        rec=next(fr)
-        #print(rec)
-        k=0
-        for j in range(len(rec)):
-            if rec[j] !='':
-                if k == 1: xnd[i] = float(rec[j])
-                if k == 2: ynd[i] = float(rec[j])
-                k=k+1
-    print(xnd[0],ynd[0])
-
-    #read in node numbers for each element 
-    for i in range(ne):
-        rec = next(fr)
-        if i==0: print(rec)
-        for j in range(2,5):
-            m = int(rec[j])
-            nm[i,j-2] = m
-            if i==0: print(rec,j,m,nm[i,j-2])
-
-    print(nm[0,:],nm.dtype)
-
-
-    rec = next(fr)
-    nope = int(rec[0])
-    print(nope)
-
-    #check expected number of open boundaries
-    x = bnd_in[1].split(' ')
-    nope2 = int(x[1])
-    if nope!=nope2: 
-        print('nope/=nope2')
-        exit()
-
-    #ok, set up flag
-    ifl_ob = int(x[2])
-
-    neta = next(fr)
-
-    for k in range(nope):
-        rec=next(fr)
-        nond = int(rec[0])
-        print(nond)
-        for i in range(nond):
-            rec = next(fr)
-            iond = int(rec[0])
-            if i == 0: print(rec,iond)
-            if iond>np or iond<=0:
-                print('iond>np')
-                exit()
-            ibnd[iond-1]=ifl_ob
-
-    #now land/island boundaries
-    #total number of land/island boundaries
-    rec = next(fr)
-    nlandb = int(rec[0])
-    #total number of land boundary nodes
-    rec = next(fr)
-    nlandn = int(rec[0])
-    print('number of land/island boundaries',nlandb)
-    print('number of land nodes',nlandn)
-
-    #check expected number of land boundaries
-    x2 = bnd_in[2].split(' ')
-    x3 = bnd_in[3].split(' ')
-    print(x2)
-    print(x3)
-    nlb = int(x2[1]) #number of land boundaries
-    nib = int(x3[1]) #number of island boundaries
-    nlib = nlb+nib
-    if nlandb!=nlib: 
-        print('nlandb/=nlb',nlandb,nlib)
-        exit()
-
-    ifl_l = int(x2[2])
-    ifl_i = int(x3[2])
-    print('flags for land and island',ifl_l,ifl_i)
-
-    for k in range(nlandb):
-        rec = next(fr)
-        nond = int(rec[0])
-        print(nond)
-        for i in range(nond):
-            rec = next(fr)
-            iond = int(rec[0])
-            if i == 0: print(rec,iond)
-            if iond>np or iond<=0:
-                print('iond>np')
-                exit()
-            #check if land or island boundary
-            if k <= nlb-1:
-                ibnd[iond-1]=ifl_l
-            else:
-                ibnd[iond-1]=ifl_i
-
-#
-#     Output
-#
-#     Output file
-with open('wwmbnd.gr3','w') as w:
-    ww = csv.writer(w,delimiter=' ')
-    ww.writerow('')
-    ww.writerow([ne,np])
-    for i in range(np):
-        ww.writerow([i+1,xnd[i],ynd[i],float(ibnd[i])])
-    for i in range(ne):
-        ww.writerow([i+1,3,nm[i,0],nm[i,1],nm[i,2]])
-
-# check duplicated nodes, and check for the first node of open 
-# bnd
-
-\end{minted}
-\clearpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Python script to download Ifremer spectral data (ncftpget.py) }
-\begin{minted}{python}
-import subprocess
-year = 2018
-lats = [54.0]
-lons = [2.5]
-model = 'GLOB-30M'
-fils = f'WW3-{model}-'
-filf = '_spec.nc'
-
-k=0
-for lo in lons:
-    lon = lo*10
-    lon = str(int(lon)).zfill(4)
-    print(lon)
-    for la in lats:
-        ifail=0
-        lat = la*10
-        lat = str(int(lat)).zfill(3)
-        print(lat)
-        fil = f'{fils}E{lon}S{lat}_{year}{filf}'
-        print(fil)
-        #ftp://ftp.ifremer.fr/ifremer/ww3/HINDCAST/GLOBMULTI_ECMWF_02/GLOB-30M/
-        #2018/SPEC_SE/WW3-GLOB-30M-E0000S680_2018_spec.nc
-        cmd =
-        f'ncftpget ftp://ftp.ifremer.fr/ifremer/ww3/HINDCAST/GLOBMULTI_ECMWF_02/{model}/{year}/SPEC_SE/{fil}'
-        print(cmd)
-        ifail = subprocess.call(cmd,shell=True)
-        if ifail != 0:
-            print(f'{fil} not found')
-        #if k==0:exit()
-
-\end{minted}
 %=====================================
 % References, variant B: external bibliography
 %=====================================
